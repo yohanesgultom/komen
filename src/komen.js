@@ -1,35 +1,36 @@
 // Komen client script
 // Author: yohanes.gultom@gmail.com
 
-var KOMEN_SRC = 'src/',
+var RECAPTCHA_KEY = '',
     KOMEN_AVATAR = 'avatar.png',
-    KOMEN_SERVER = '/komen/api/',
-    RECAPTCHA_KEY = ''
+    KOMEN_LOADING = 'komen.gif'
 
-function Komen (_src, _server) {
+// set the parameter from html
+// refrain from manual edit
+// unless you know what you are doing
+function Komen (_src, _server, _commentStartHereId) {
     var that = this
-    that.src = _src ? _src + '/' : KOMEN_SRC
-    that.server = _server ? _server + '/' : KOMEN_SERVER
+    that.src = _src ? _src + '/' : 'src/'
+    that.server = _server ? _server + '/' : '/komen/api/'
+    that.commentStartHereId = _commentStartHereId ? _commentStartHereId : 'comment-start-here'
     that.post = document.location.href
 
     this.init = function () {
-        var commentStartHereId = 'comment-start-here'
-        $('#' + commentStartHereId).append($('<img>').attr('src', that.src + 'komen.gif'))
+        $('#' + that.commentStartHereId).append($('<img>').attr('src', that.src + KOMEN_LOADING))
         $.getJSON(that.server + 'api/comments', {post: that.post}, function(data) {
-            var container = $('#' + commentStartHereId).parent(),
+            var container = $('#' + that.commentStartHereId).parent(),
                 comments = data.comments
             container.append(that.komenForm())
             comments.forEach(function(c) {
                 container.append(that.komenPost(c))
             })
-            $('#' + commentStartHereId).remove()
+            $('#' + that.commentStartHereId).remove()
         })
     }
 
     this.loadPosts = function() {
-        var container = $('#komen-form').parent(),
-            commentStartHereId = 'comment-start-here',
-            loading = $('<div>').attr('id', 'commentStartHereId').append($('<img>').attr('src', that.src + 'komen.gif'))
+        var container = $('#komen-form').parent()
+            loading = $('<div>').attr('id', that.commentStartHereId).append($('<img>').attr('src', that.src + KOMEN_LOADING))
 
         // remove comments
         $('.komen-post', container).remove()

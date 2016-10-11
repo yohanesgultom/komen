@@ -3,15 +3,16 @@
 
 // config
 var RECAPTCHA_SECRET = '',
-    RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify',
-    PORT = 3000
+    DB_PATH = 'server/db'
+    PORT = 3000,
+    RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
 
 var express = require("express"),
     bodyParser = require('body-parser'),
     moment = require('moment'),
     Datastore = require('nedb'),
     request = require('request'),
-    db = new Datastore({ filename: 'server/db', autoload: true }),
+    db = new Datastore({ filename: DB_PATH, autoload: true }),
     app = express(),
     LOG = {
         success: '\x1b[32m%s\x1b[0m',
