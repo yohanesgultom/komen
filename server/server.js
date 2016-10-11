@@ -2,7 +2,7 @@
 // Author: yohanes.gultom@gmail.com
 
 // config
-var RECAPTCHA_SECRET = '',
+var RECAPTCHA_SECRET = '6Lde8wgUAAAAAAIQK12vVBmSlHDl5b2TZ6CMUUVn',
     DB_PATH = 'server/db'
     PORT = 3000,
     RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'

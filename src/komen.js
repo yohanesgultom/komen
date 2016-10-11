@@ -1,7 +1,7 @@
 // Komen client script
 // Author: yohanes.gultom@gmail.com
 
-var RECAPTCHA_KEY = '',
+var RECAPTCHA_KEY = '6Lde8wgUAAAAAAgCR5oZYlJYP_TlNtP4WxnRz_nT',
     KOMEN_AVATAR = 'avatar.png',
     KOMEN_LOADING = 'komen.gif'
 
@@ -16,16 +16,11 @@ function Komen (_src, _server, _commentStartHereId) {
     that.post = document.location.href
 
     this.init = function () {
-        $('#' + that.commentStartHereId).append($('<img>').attr('src', that.src + KOMEN_LOADING))
-        $.getJSON(that.server + 'api/comments', {post: that.post}, function(data) {
-            var container = $('#' + that.commentStartHereId).parent(),
-                comments = data.comments
-            container.append(that.komenForm())
-            comments.forEach(function(c) {
-                container.append(that.komenPost(c))
-            })
-            $('#' + that.commentStartHereId).remove()
-        })
+        var container = $('#' + that.commentStartHereId).parent()
+        container.append(that.komenForm())
+        that.loadPosts()
+        // google recaptcha
+        grecaptcha.render('g-recaptcha', {sitekey: RECAPTCHA_KEY, theme: 'light'})
     }
 
     this.loadPosts = function() {
@@ -67,7 +62,7 @@ function Komen (_src, _server, _commentStartHereId) {
         // captcha
         .append(
             $('<div>').attr('class', 'form-group')
-                .append($('<div>').attr('class', 'g-recaptcha').attr('data-sitekey', RECAPTCHA_KEY)))
+                .append($('<div>').attr('id', 'g-recaptcha').attr('class', 'g-recaptcha').attr('data-sitekey', RECAPTCHA_KEY)))
         // button
         .append($('<button>').attr('type', 'submit').attr('class', 'btn btn-primary').text(submitLabel).on('click', function() {
             var form = $(this).parent(),

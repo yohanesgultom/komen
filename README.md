@@ -47,13 +47,19 @@ Consider using nodejs `forever` or `pm2` to run it in production
 
 Step 0: Download zip/clone repo, copy `src` dir to your web `js` dir and rename it whatever you like eg `komen`
 
-Step 1: Add dependencies
+Step 1: Register for Google ReCaptcha https://www.google.com/recaptcha and set the key in `komen.js`
+
+```
+var RECAPTCHA_KEY = 'recaptchakey',
+```
+
+Step 2: Add dependencies
 
 ```
 <html>
 <head>
     ...
-    <script src="https://www.google.com/recaptcha/api.js"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad" async defer></script>
     <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -62,25 +68,19 @@ Step 1: Add dependencies
 </body>
 </html>
 ```
-Step 2: Include `Komen` script and call the constructor (which will render the comment block)
-
-```
-...
-<script src="js/jquery.js"></script>
-<script src="js/renamed-src-dir/komen.js"></script>
-<script>Komen('js/renamed-src-dir', 'http://localhost:3000')</script>
-</body>
-</html>
-```
 
 Step 3: Add `div` with id `comment-start-here` to where you want the comment form and comments placed
 
 ```
 <div id="comment-start-here"></div>
+<script src="js/renamed-src-dir/komen.js"></script>
+<script type="text/javascript" src="/assets/js/komen/komen.js"></script>
+<script>
+  var onReCaptchaLoad = function() {
+      console.log('recaptcha ready');
+      var komen = Komen('/assets/js/komen', 'http://localhost:3000');
+  }
+</script>
 ```
 
-Step 4: Register for Google ReCaptcha https://www.google.com/recaptcha and set the key in `komen.js`
-
-```
-var RECAPTCHA_KEY = 'recaptchakey',
-```
+> Check `demo` dir for example
