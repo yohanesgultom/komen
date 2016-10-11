@@ -1,0 +1,24 @@
+{
+  "name": "komen",
+  "version": "1.0.0",
+  "description": "self-hosted comment service",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "comment",
+    "service",
+    "self-hosted"
+  ],
+  "author": "yohanes.gultom",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "moment": "^2.15.1",
+    "nedb": "^1.8.0",
+    "request": "^2.75.0"
+  }
+}
