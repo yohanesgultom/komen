@@ -2,6 +2,11 @@
 
 Self-hosted comment service. Powered by express.js and nedb (mongo-like embedded database)
 
+> Todo
+>* Use iframe to maintain isolated style and avoid CSS conflics
+>* Handle nested comment (just 1 level like facebook)
+>* Use jquery html parsing instead dom builder for verbosity
+
 ## Server side
 
 #### Dependencies
@@ -18,7 +23,7 @@ $ npm install
 
 Set Google ReCaptcha secret, db location and port in `server/server.js`
 
-```
+```javascript
 // config
 var RECAPTCHA_SECRET = '',
     DB_PATH = 'server/db'
@@ -49,13 +54,13 @@ Step 0: Download zip/clone repo, copy `src` dir to your web `js` dir and rename 
 
 Step 1: Register for Google ReCaptcha https://www.google.com/recaptcha and set the key in `komen.js`
 
-```
+```javascript
 var RECAPTCHA_KEY = 'recaptchakey',
 ```
 
 Step 2: Add dependencies
 
-```
+```html
 <html>
 <head>
     ...
@@ -71,7 +76,7 @@ Step 2: Add dependencies
 
 Step 3: Add `div` with id `comment-start-here` to where you want the comment form and comments placed
 
-```
+```html
 <div id="comment-start-here"></div>
 <script src="js/renamed-src-dir/komen.js"></script>
 <script type="text/javascript" src="/assets/js/komen/komen.js"></script>
