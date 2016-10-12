@@ -1,6 +1,6 @@
 # Komen
 
-Self-hosted comment service. Powered by express.js and nedb (mongo-like embedded database)
+Self-hosted comment service. Powered by [express.js](http://expressjs.com) and [nedb](https://github.com/louischatriot/nedb) (mongo-like embedded database)
 
 > Todo
 >* Use iframe to maintain isolated style and avoid CSS conflics
