@@ -19,8 +19,6 @@ function Komen (_src, _server, _commentStartHereId) {
         var container = $('#' + that.commentStartHereId).parent()
         container.append(that.komenForm())
         that.loadPosts()
-        // google recaptcha
-        grecaptcha.render('g-recaptcha', {sitekey: RECAPTCHA_KEY, theme: 'light'})
     }
 
     this.loadPosts = function() {
@@ -39,6 +37,10 @@ function Komen (_src, _server, _commentStartHereId) {
                 container.append(that.komenPost(c))
             })
             loading.remove()
+            
+            // google recaptcha
+            // make sure it is rendered after form
+            grecaptcha.render('g-recaptcha', {sitekey: RECAPTCHA_KEY, theme: 'light'})
         })
     }
 

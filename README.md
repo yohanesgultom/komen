@@ -2,10 +2,12 @@
 
 Self-hosted comment service. Powered by express.js and nedb (mongo-like embedded database)
 
-> Todo
+> Todo:
 >* Use iframe to maintain isolated style and avoid CSS conflics
 >* Handle nested comment (just 1 level like facebook)
 >* Use jquery html parsing instead dom builder for verbosity
+>* Email notification for new comment
+>* Render number of comment (to be displayed on post's excerpt)
 
 ## Server side
 
@@ -38,8 +40,6 @@ $ npm start
 
 Consider using nodejs `forever` or `pm2` to run it in production
 
-
-
 ## Client side
 
 #### Dependencies
@@ -64,12 +64,20 @@ Step 2: Add dependencies
 <html>
 <head>
     ...
-    <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad" async defer></script>
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 ...
-<script src="js/jquery.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/renamed-src-dir/komen.js"></script>
+    <script type="text/javascript" src="/assets/js/komen/komen.js"></script>
+    <script>
+      var onReCaptchaLoad = function() {
+          var komen = Komen('/assets/js/komen', 'http://localhost:3000');
+      }
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad"></script>
 </body>
 </html>
 ```
@@ -77,15 +85,10 @@ Step 2: Add dependencies
 Step 3: Add `div` with id `comment-start-here` to where you want the comment form and comments placed
 
 ```html
+...
 <div id="comment-start-here"></div>
-<script src="js/renamed-src-dir/komen.js"></script>
-<script type="text/javascript" src="/assets/js/komen/komen.js"></script>
-<script>
-  var onReCaptchaLoad = function() {
-      console.log('recaptcha ready');
-      var komen = Komen('/assets/js/komen', 'http://localhost:3000');
-  }
-</script>
+...
 ```
-
-> Check `demo` dir for example
+> Note:
+> * Check `demo` dir for example
+> * If the ReCaptcha not rendering, clear your server's (eg. DNS cache) & browser's cache (or use private mode)

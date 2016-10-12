@@ -24,7 +24,6 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad" async defer></script>
 </head>
 
 <body>
@@ -102,13 +101,6 @@
 
                 <!-- Blog Comments -->
                 <div id="comment-start-here"></div>
-                <script type="text/javascript" src="../src/komen.js"></script>
-                <script>
-                  var onReCaptchaLoad = function() {
-                      console.log('recaptcha ready');
-                      var komen = Komen('../src', 'http://localhost:3000');
-                  }
-                </script>
 
             </div>
 
@@ -193,6 +185,14 @@
     <!-- Bootstrap Core JavaScript -->
     <script src="js/bootstrap.min.js"></script>
 
+    <!-- Google Recaptcha -->
+    <script type="text/javascript" src="../src/komen.js"></script>
+    <script>
+      var onReCaptchaLoad = function() {
+          var komen = Komen('../src', 'http://localhost:3000');
+      }
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad" async defer></script>
 </body>
 
 </html>
