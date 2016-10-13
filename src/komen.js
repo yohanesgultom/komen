@@ -12,15 +12,17 @@ function Komen (_src, _server, _commentStartHereId) {
     var that = this
     that.src = _src ? _src + '/' : 'src/'
     that.server = _server ? _server + '/' : '/komen/api/'
-    that.commentStartHereId = _commentStartHereId ? _commentStartHereId : 'comment-start-here'
+    that.commentStartHereId = _commentStartHereId ? _commentStartHereId : 'komen-start'
     that.post = document.location.href
 
+    // initialize comment form and load existing comments
     this.init = function () {
         var container = $('#' + that.commentStartHereId).parent()
         container.append(that.komenForm())
         that.loadPosts()
     }
 
+    // load comment posts form server
     this.loadPosts = function() {
         var container = $('#komen-form').parent()
             loading = $('<div>').attr('id', that.commentStartHereId).append($('<img>').attr('src', that.src + KOMEN_LOADING))
@@ -37,7 +39,7 @@ function Komen (_src, _server, _commentStartHereId) {
                 container.append(that.komenPost(c))
             })
             loading.remove()
-            
+
             // google recaptcha
             // make sure it is rendered after form
             grecaptcha.render('g-recaptcha', {sitekey: RECAPTCHA_KEY, theme: 'light'})
@@ -124,6 +126,25 @@ function Komen (_src, _server, _commentStartHereId) {
         .append(body)
     }
 
+    // set comment count to elements
+    this.setCount = function () {
+        var posts = [],
+            counts = $('.komen-count')
+        counts.each(function (index, elem) {
+            posts.push(document.location.origin + $(elem).attr('data-post'))
+        })
+        console.log(posts)
+        $.getJSON(that.server + 'api/comments-count', {posts: posts}, function(data) {
+            counts.each(function (index, elem) {
+                var post = document.location.origin + $(elem).attr('data-post')
+                if (data[post]) {
+                    $(elem).text(data[post])
+                }
+            })
+        })
+    }
+
+    // execute
     this.init()
 
 }

@@ -81,7 +81,7 @@
                 <hr>
 
                 <!-- Date/Time -->
-                <p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM</p>
+                <p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM (<span class="komen-count" data-post="/komen/demo/">0</span> comment(s))</p>
 
                 <hr>
 
@@ -100,7 +100,7 @@
                 <hr>
 
                 <!-- Blog Comments -->
-                <div id="comment-start-here"></div>
+                <div id="komen-start"></div>
 
             </div>
 
@@ -189,7 +189,8 @@
     <script type="text/javascript" src="../src/komen.js"></script>
     <script>
       var onReCaptchaLoad = function() {
-          var komen = Komen('../src', 'http://localhost:3000');
+          var komen = new Komen('../src', 'http://localhost:3000')
+          komen.setCount()
       }
     </script>
     <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad" async defer></script>

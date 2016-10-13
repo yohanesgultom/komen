@@ -41,15 +41,15 @@ $ npm start
 
 #### Setup
 
-Step 0: Download zip/clone repo, copy `src` dir to your web `js` dir and rename it whatever you like eg `komen`
+**Step 0**: Download zip/clone repo, copy `src` dir to your web `js` dir and rename it whatever you like eg `komen`
 
-Step 1: Register for Google ReCaptcha https://www.google.com/recaptcha and set the key in `komen.js`
+**Step 1**: Register for Google ReCaptcha https://www.google.com/recaptcha and set the key in `komen.js`
 
 ```javascript
 var RECAPTCHA_KEY = 'recaptchakey',
 ```
 
-Step 2: Add dependencies
+**Step 2**: Add dependencies
 
 ```html
 <html>
@@ -73,13 +73,20 @@ Step 2: Add dependencies
 </html>
 ```
 
-Step 3: Add `div` with id `comment-start-here` to where you want the comment form and comments placed
+**Step 3**: Add `div` with id `komen-start` to where you want the comment form and comments placed
 
 ```html
 ...
-<div id="comment-start-here"></div>
+<div id="komen-start"></div>
 ...
 ```
+
+**Step 4** (optional): To display comments count (eg. at home or index page), use `span` with id `komen-count` and `data-post` attribute containing the post. Make sure the `data-post` value exactly match the corresponding post's URL
+
+```html
+<p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM (<span class="komen-count" data-post="/komen/demo/">0</span> comment(s))</p>
+```
+
 > Note:
 > * Check `demo` dir for example
 > * If the ReCaptcha not rendering, clear your server's (eg. DNS cache) & browser's cache (or use private mode)

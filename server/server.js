@@ -75,6 +75,35 @@ app.get("/api/comments", function(req, res) {
         })
 });
 
+// count comments per post
+app.get("/api/comments-count", function(req, res) {
+    var posts = req.query.posts,
+        promises = []
+
+    if (posts && posts.length > 0) {
+        posts.forEach(function(p) {
+            promises.push(new Promise(function (resolve, reject) {
+                db.count({ post: p }, function (err, count) {
+                    if (err) {
+                        reject(err)
+                    } else {
+                        resolve([p, count])
+                    }
+                })
+            }))
+        })
+        Promise.all(promises).then(function (counts) {
+            var result = {}
+            counts.forEach(function (tuple) {
+                result[tuple[0]] = tuple[1]
+            })
+            res.json(result)
+        }, function (errors) {
+            res.status(500).json(errors)
+        })
+    }
+});
+
 // post new comment
 // by post id (the post url)
 app.post("/api/comments", function(req, res) {
@@ -177,9 +206,9 @@ function notifyAboutNewComments() {
 }
 
 // run scheduler
-later.date.localTime()
-later.setInterval(
-    notifyAboutNewComments,
-    // check and send notification at 8am, 12pm and 7pm everyday
-    later.parse.recur().on(8, 12, 19).hour()
-)
+// later.date.localTime()
+// later.setInterval(
+//     notifyAboutNewComments,
+//     // check and send notification at 8am, 12pm and 7pm everyday
+//     later.parse.recur().on(8, 12, 19).hour()
+// )
