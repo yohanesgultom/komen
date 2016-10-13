@@ -93,8 +93,10 @@ and call `komen.count()` without calling `keren.init()` (except there is a comme
 <script src="js/jquery.js"></script>
 <script type="text/javascript" src="/assets/js/komen/komen.js"></script>
 <script>
-  var komen = new Komen('/assets/js/komen', 'http://localhost:3000')
-  komen.count()
+    $(document).ready(function() {
+        var komen = new Komen('/assets/js/komen', 'http://localhost:3000')
+        komen.setCount()        
+    })
 </script>
 ```
 
