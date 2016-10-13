@@ -1,0 +1,11 @@
+{
+    "server_port": 3000,
+    "recaptcha_secret": "recaptchasecretkey",
+    "db_path": "server/db",
+    "mailer": {
+        "sender_name": "John Doe Blog",
+        "username": "john.doe@gmail.com",
+        "password": "secretpassword",
+        "smtp": "smtp.gmail.com"
+    }
+}

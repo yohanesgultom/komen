@@ -6,7 +6,6 @@ Self-hosted comment service. Powered by [express.js](http://expressjs.com) and [
 >* Use iframe to maintain isolated style and avoid CSS conflics
 >* Handle nested comment (just 1 level like facebook)
 >* Use jquery html parsing instead dom builder for verbosity
->* Email notification for new comment
 >* Render number of comment (to be displayed on post's excerpt)
 
 ## Server side
@@ -22,23 +21,13 @@ Clone repo and run
 ```
 $ npm install
 ```
-
-Set Google ReCaptcha secret, db location and port in `server/server.js`
-
-```javascript
-// config
-var RECAPTCHA_SECRET = '',
-    DB_PATH = 'server/db'
-    PORT = 3000
-```
-
-Run the server
+Rename `server/config.json.example` to `config.json` and adjust the values properly. Then you can run the server
 
 ```
 $ npm start
 ```
 
-Consider using nodejs `forever` or `pm2` to run it in production
+> Consider using package such as `forever` or `pm2` to run it in production
 
 ## Client side
 
@@ -47,6 +36,8 @@ Consider using nodejs `forever` or `pm2` to run it in production
 * Jquery https://jquery.com/
 * Google reCaptcha https://www.google.com/recaptcha/api.js
 * Bootstrap (optional) https://getbootstrap.com/
+
+> Since the comment form and posts are appended directly to your page, it will follow your CSS. If you are using Bootstrap then you are safe. Otherwise you may want to add specific CSS for them
 
 #### Setup
 

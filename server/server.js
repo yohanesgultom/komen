@@ -1,18 +1,34 @@
 // Komen server script
 // Author: yohanes.gultom@gmail.com
 
-// config
-var RECAPTCHA_SECRET = '6Lde8wgUAAAAAAIQK12vVBmSlHDl5b2TZ6CMUUVn',
-    DB_PATH = 'server/db'
-    PORT = 3000,
-    RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify'
-
 var express = require("express"),
     bodyParser = require('body-parser'),
     moment = require('moment'),
     Datastore = require('nedb'),
     request = require('request'),
-    db = new Datastore({ filename: DB_PATH, autoload: true }),
+    fs = require('fs'),
+    nodemailer = require('nodemailer'),
+    later = require('later'),
+    log4js = require('log4js')
+
+// logging
+log4js.loadAppender('file')
+log4js.addAppender(log4js.appenders.file('server/server.log'), 'komen')
+var logger = log4js.getLogger('komen')
+logger.setLevel('ERROR')
+
+// read config
+var RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify',
+    data = fs.readFileSync('server/config.json'),
+    config = JSON.parse(data),
+    PORT = config.server_port,
+    RECAPTCHA_SECRET = config.recaptcha_secret,
+    DB_PATH = config.db_path,
+    MAILER = config.mailer,
+    NODEMAILER_STR = 'smtps://' + MAILER.username + ':' + MAILER.password + '@' + MAILER.smtp
+
+// load database
+var db = new Datastore({ filename: DB_PATH, autoload: true }),
     app = express(),
     LOG = {
         success: '\x1b[32m%s\x1b[0m',
@@ -41,7 +57,10 @@ app.get("/api/comments", function(req, res) {
     db.find({ post: req.query.post })
         .sort({ datetime: 1 })
         .exec(function(err, comments) {
-            if (err) res.status(500).json(err)
+            if (err) {
+                logger.error(err)
+                res.status(500).json(err)
+            }
             // formatting
             var response = {
                 comments: comments.map(function (c) {
@@ -63,7 +82,8 @@ app.post("/api/comments", function(req, res) {
             post: req.body.post,
             name: req.body.name,
             body: req.body.body,
-            datetime: new Date()
+            datetime: new Date(),
+            notifdate: null
         },
         recaptchaResponse = req.body.recaptcha,
         ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress || req.connection.socket.remoteAddress,
@@ -75,13 +95,19 @@ app.post("/api/comments", function(req, res) {
 
     // validate recaptcha
     request.post({url: RECAPTCHA_URL, form: formData}, function(err, httpResponse, body){
-        if (err) res.status(500).send(err)
+        if (err) {
+            logger.error(err)
+            res.status(500).send(err)
+        }
         body = JSON.parse(body)
         if (body.success != true) {
             res.status(500).json(body)
         } else {
             db.insert(comment, function (err, comment) {
-                if (err) res.status(500).json(err)
+                if (err) {
+                    logger.error(err)
+                    res.status(500).json(err)
+                }
                 res.sendStatus(204)
             })
         }
@@ -91,3 +117,69 @@ app.post("/api/comments", function(req, res) {
 // run express
 app.listen(PORT)
 console.log(LOG.success, 'Komen is running on http://localhost:' + PORT)
+
+// scheduled comment notification email
+var transporter = nodemailer.createTransport(NODEMAILER_STR),
+    mailOptions = {
+        from: '"' + MAILER.sender_name + '" <' + MAILER.username + '>',
+        to: MAILER.username
+    }
+
+function notifyAboutNewComments() {
+    db.find({ notifdate: null })
+        .sort({ datetime: -1 })
+        .exec(function(err, comments) {
+            if (err) {
+                logger.error(err)
+                throw err
+            }
+            console.log(comments)
+            if (comments.length > 0) {
+                var body = [],
+                    subject = 'You have ' + comments.length + ' new comment(s)'
+                body.push('<p>You have <strong>' + comments.length + '</strong> new comment(s):</p><ul>')
+                comments.forEach(function(c) {
+                    body.push('<li><strong>' + c.name + '</strong> ')
+                    body.push('at ' + moment(c.datetime).format('LLLL') + ' ')
+                    body.push('on <a href="' + c.post  + '">' + c.post + '</a> ')
+                    body.push('said: <p>' + c.body + '</p></li>')
+                })
+                body.push('</ul>')
+                mailOptions.subject = subject
+                mailOptions.html = body.join('')
+
+                // send email
+                transporter.sendMail(mailOptions, function(error, info){
+                    if (error) {
+                        logger.error(error)
+                    }
+                    logger.info('Message sent: ' + info.response)
+
+                    // update notification date
+                    var now = new Date(),
+                        commentIds = comments.map(function(c) {return c._id})
+                    db.update(
+                        { _id: {$in: commentIds} },
+                        { $set: { notifdate: now } },
+                        { multi: true },
+                        function (err, numReplaced) {
+                            if (error) {
+                                logger.error(error)
+                            }
+                            logger.info(commentIds.length + ' comments\' notifdate have been updated')
+                        }
+                    )
+                })
+            } else {
+                logger.info('No new comments')
+            }
+        })
+}
+
+// run scheduler
+later.date.localTime()
+later.setInterval(
+    notifyAboutNewComments,
+    // check and send notification at 8am, 12pm and 7pm everyday
+    later.parse.recur().on(8, 12, 19).hour()
+)
