@@ -6,7 +6,6 @@ Self-hosted comment service. Powered by [express.js](http://expressjs.com) and [
 >* Use iframe to maintain isolated style and avoid CSS conflics
 >* Handle nested comment (just 1 level like facebook)
 >* Use jquery html parsing instead dom builder for verbosity
->* Render number of comment (to be displayed on post's excerpt)
 
 ## Server side
 
