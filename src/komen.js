@@ -130,21 +130,26 @@ function Komen (_src, _server, _commentStartHereId) {
     this.setCount = function () {
         var posts = [],
             counts = $('.komen-count')
+
         counts.each(function (index, elem) {
-            posts.push(document.location.origin + $(elem).attr('data-post'))
+            var post = $(elem).attr('data-post')
+            if (!post.startsWith('http')) {
+                post = document.location.origin + post
+            }
+            posts.push(post)
         })
-        console.log(posts)
+
         $.getJSON(that.server + 'api/comments-count', {posts: posts}, function(data) {
             counts.each(function (index, elem) {
-                var post = document.location.origin + $(elem).attr('data-post')
+                var post = $(elem).attr('data-post')
+                if (!post.startsWith('http')) {
+                    post = document.location.origin + post
+                }
                 if (data[post]) {
                     $(elem).text(data[post])
                 }
             })
         })
     }
-
-    // execute
-    this.init()
 
 }

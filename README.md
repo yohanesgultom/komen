@@ -61,11 +61,11 @@ var RECAPTCHA_KEY = 'recaptchakey',
 <body>
 ...
     <script src="js/jquery.js"></script>
-    <script src="js/renamed-src-dir/komen.js"></script>
     <script type="text/javascript" src="/assets/js/komen/komen.js"></script>
     <script>
       var onReCaptchaLoad = function() {
-          var komen = Komen('/assets/js/komen', 'http://localhost:3000');
+          var komen = new Komen('/assets/js/komen', 'http://localhost:3000')
+          komen.init()
       }
     </script>
     <script src="https://www.google.com/recaptcha/api.js?render=explicit&onload=onReCaptchaLoad"></script>
@@ -84,7 +84,20 @@ var RECAPTCHA_KEY = 'recaptchakey',
 **Step 4** (optional): To display comments count (eg. at home or index page), use `span` with id `komen-count` and `data-post` attribute containing the post. Make sure the `data-post` value exactly match the corresponding post's URL
 
 ```html
-<p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM (<span class="komen-count" data-post="/komen/demo/">0</span> comment(s))</p>
+<p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM (<span class="komen-count" data-post="http://localhost/komen/demo/">0</span> comment(s))</p>
+```
+
+and call `komen.count()` without calling `keren.init()` (except there is a comment form in the same page)
+
+```html
+<script src="js/jquery.js"></script>
+<script type="text/javascript" src="/assets/js/komen/komen.js"></script>
+<script>
+  var onReCaptchaLoad = function() {
+      var komen = new Komen('/assets/js/komen', 'http://localhost:3000')
+      komen.count()
+  }
+</script>
 ```
 
 > Note:

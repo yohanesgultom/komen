@@ -81,7 +81,7 @@
                 <hr>
 
                 <!-- Date/Time -->
-                <p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM (<span class="komen-count" data-post="/komen/demo/">0</span> comment(s))</p>
+                <p><span class="glyphicon glyphicon-time"></span> Posted on August 24, 2013 at 9:00 PM (<span class="komen-count" data-post="http://localhost/komen/demo/">0</span> comment(s))</p>
 
                 <hr>
 
@@ -189,7 +189,11 @@
     <script type="text/javascript" src="../src/komen.js"></script>
     <script>
       var onReCaptchaLoad = function() {
+          // init params
           var komen = new Komen('../src', 'http://localhost:3000')
+          // generate comment form and load existing posts
+          komen.init()
+          // get comment count per post
           komen.setCount()
       }
     </script>

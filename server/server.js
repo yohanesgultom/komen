@@ -206,9 +206,9 @@ function notifyAboutNewComments() {
 }
 
 // run scheduler
-// later.date.localTime()
-// later.setInterval(
-//     notifyAboutNewComments,
-//     // check and send notification at 8am, 12pm and 7pm everyday
-//     later.parse.recur().on(8, 12, 19).hour()
-// )
+later.date.localTime()
+later.setInterval(
+    notifyAboutNewComments,
+    // check and send notification at 8am, 12pm and 7pm everyday
+    later.parse.recur().on(8, 12, 19).hour()
+)
