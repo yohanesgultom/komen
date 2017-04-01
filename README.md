@@ -30,6 +30,14 @@ $ npm start
 
 > Consider using package such as `forever` or `pm2` to run it in production
 
+#### Test
+
+Run tests using
+
+```
+$ npm test
+```
+
 ## Client side
 
 #### Dependencies
