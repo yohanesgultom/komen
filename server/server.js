@@ -13,9 +13,20 @@ var express = require("express"),
     log4js = require('log4js')
 
 // read config
-var data = fs.readFileSync('server/config.json'),
-    env = process.env.NODE_ENV || 'production',
-    config = JSON.parse(data),
+var env = process.env.NODE_ENV || 'production',
+    config = env == 'production' ? JSON.parse(fs.readFileSync('server/config.json')) : {
+        server_port: 3000,
+        recaptcha_url: 'https://www.google.com/recaptcha/api/siteverify',
+        recaptcha_secret: 'secret',
+        db_path: null,
+        log_level: 'INFO',
+        mailer: {
+            sender_name: 'Undefined',
+            username: 'undefined@mail.com',
+            password: 'secret',
+            smtp: 'smtp.mail.com'
+        }
+    },
     PORT = config.server_port,
     RECAPTCHA_URL = config.recaptcha_url,
     RECAPTCHA_SECRET = config.recaptcha_secret,
@@ -32,11 +43,11 @@ log4js.configure({
   replaceConsole: true
 })
 var logger = log4js.getLogger('komen')
-logger.setLevel((env == 'production') ? config.log_level : 'INFO')
+logger.setLevel(config.log_level)
 
 
 // load database
-var db = (env == 'production') ? new Datastore({filename: DB_PATH, autoload: true }) : new Datastore(),
+var db = DB_PATH ? new Datastore({filename: DB_PATH, autoload: true }) : new Datastore(),
     app = express()
 
 // set db index
