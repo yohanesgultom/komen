@@ -134,7 +134,7 @@ function Komen (_src, _server, _commentStartHereId) {
         counts.each(function (index, elem) {
             var post = $(elem).attr('data-post')
             if (!post.startsWith('http')) {
-                post = document.location.origin + post
+                post = document.location.hostname + post
             }
             posts.push(post)
         })
@@ -143,7 +143,7 @@ function Komen (_src, _server, _commentStartHereId) {
             counts.each(function (index, elem) {
                 var post = $(elem).attr('data-post')
                 if (!post.startsWith('http')) {
-                    post = document.location.origin + post
+                    post = document.location.hostname + post
                 }
                 if (data[post]) {
                     $(elem).text(data[post])
@@ -151,5 +151,4 @@ function Komen (_src, _server, _commentStartHereId) {
             })
         })
     }
-
 }
