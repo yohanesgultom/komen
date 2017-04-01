@@ -5,7 +5,7 @@
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "test": "node test.js"
+    "test": "NODE_ENV=test mocha"
   },
   "keywords": [
     "comment",
@@ -16,11 +16,16 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
+    "chai-http": "^3.0.0",
     "express": "^4.14.0",
+    "express-sanitizer": "^1.0.2",
     "later": "^1.2.0",
     "log4js": "^0.6.38",
+    "mocha": "^3.2.0",
     "moment": "^2.15.1",
     "nedb": "^1.8.0",
+    "nock": "^9.0.11",
     "nodemailer": "^2.6.4",
     "request": "^2.75.0"
   }

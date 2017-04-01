@@ -2,6 +2,7 @@
 // Author: yohanes.gultom@gmail.com
 
 var express = require("express"),
+    expressSanitizer = require('express-sanitizer'),
     bodyParser = require('body-parser'),
     moment = require('moment'),
     Datastore = require('nedb'),
@@ -11,35 +12,44 @@ var express = require("express"),
     later = require('later'),
     log4js = require('log4js')
 
-// logging
-log4js.loadAppender('file')
-log4js.addAppender(log4js.appenders.file('server/server.log'), 'komen')
-var logger = log4js.getLogger('komen')
-logger.setLevel('ERROR')
-
 // read config
-var RECAPTCHA_URL = 'https://www.google.com/recaptcha/api/siteverify',
-    data = fs.readFileSync('server/config.json'),
+var data = fs.readFileSync('server/config.json'),
+    env = process.env.NODE_ENV || 'production',
     config = JSON.parse(data),
     PORT = config.server_port,
+    RECAPTCHA_URL = config.recaptcha_url,
     RECAPTCHA_SECRET = config.recaptcha_secret,
     DB_PATH = config.db_path,
     MAILER = config.mailer,
     NODEMAILER_STR = 'smtps://' + MAILER.username + ':' + MAILER.password + '@' + MAILER.smtp
 
+// logging
+log4js.configure({
+  appenders: [
+    { type: 'console' },
+    { type: 'file', filename: 'server/server.log', category: 'komen' }
+  ],
+  replaceConsole: true
+})
+var logger = log4js.getLogger('komen')
+logger.setLevel((env == 'production') ? config.log_level : 'INFO')
+
+
 // load database
-var db = new Datastore({ filename: DB_PATH, autoload: true }),
-    app = express(),
-    LOG = {
-        success: '\x1b[32m%s\x1b[0m',
-        error: '\x1b[31m%s\x1b[0m',
-        warn: '\x1b[93m%s %s\x1b[0m'
-    }
+var db = (env == 'production') ? new Datastore({filename: DB_PATH, autoload: true }) : new Datastore(),
+    app = express()
+
+// set db index
+db.ensureIndex({ fieldName: 'post' }, function (err) {
+  if (err) logger.error(err)
+})
 
 // support json encoded bodies
 app.use(bodyParser.json())
 // support encoded bodies
 app.use(bodyParser.urlencoded({ extended: true }))
+// sanitizer
+app.use(expressSanitizer())
 
 // allow cors
 // because server with different port
@@ -53,8 +63,8 @@ app.use(function(req, res, next) {
 // get all comments
 // by post id (the post url)
 app.get("/api/comments", function(req, res) {
-
-    db.find({ post: req.query.post })
+    var url = req.query.post ? req.sanitize(normalizeUrl(req.query.post)) : ''
+    db.find({ post: url })
         .sort({ datetime: 1 })
         .exec(function(err, comments) {
             if (err) {
@@ -81,7 +91,11 @@ app.get("/api/comments-count", function(req, res) {
         promises = []
 
     if (posts && posts.length > 0) {
+        if (posts.constructor != Array) {
+            posts = [posts]
+        }
         posts.forEach(function(p) {
+            p = normalizeUrl(req.sanitize(p))
             promises.push(new Promise(function (resolve, reject) {
                 db.count({ post: p }, function (err, count) {
                     if (err) {
@@ -108,9 +122,9 @@ app.get("/api/comments-count", function(req, res) {
 // by post id (the post url)
 app.post("/api/comments", function(req, res) {
     var comment = {
-            post: req.body.post,
-            name: req.body.name,
-            body: req.body.body,
+            post: req.body.post ? normalizeUrl(req.sanitize(req.body.post)) : req.body.post,
+            name: req.body.name ? req.sanitize(req.body.name) : req.body.name,
+            body: req.body.body ? req.sanitize(req.body.body) : req.body.body,
             datetime: new Date(),
             notifdate: null
         },
@@ -121,6 +135,11 @@ app.post("/api/comments", function(req, res) {
             response: recaptchaResponse,
             remoteip: ip
         }
+
+    // validate
+    if (!comment.post || !comment.name || !comment.body) {
+        res.sendStatus(400).send('Empy values in comment')
+    }
 
     // validate recaptcha
     request.post({url: RECAPTCHA_URL, form: formData}, function(err, httpResponse, body){
@@ -144,8 +163,9 @@ app.post("/api/comments", function(req, res) {
 });
 
 // run express
-app.listen(PORT)
-console.log(LOG.success, 'Komen is running on http://localhost:' + PORT)
+var server = app.listen(PORT, function() {
+    logger.info('Komen is running on http://localhost:' + PORT)
+})
 
 // scheduled comment notification email
 var transporter = nodemailer.createTransport(NODEMAILER_STR),
@@ -162,7 +182,6 @@ function notifyAboutNewComments() {
                 logger.error(err)
                 throw err
             }
-            console.log(comments)
             if (comments.length > 0) {
                 var body = [],
                     subject = 'You have ' + comments.length + ' new comment(s)'
@@ -205,6 +224,10 @@ function notifyAboutNewComments() {
         })
 }
 
+function normalizeUrl(url) {
+    return url.trim().replace(/^https?\:\/\//i, '')
+}
+
 // run scheduler
 later.date.localTime()
 later.setInterval(
@@ -212,3 +235,10 @@ later.setInterval(
     // check and send notification at 8am, 12pm and 7pm everyday
     later.parse.recur().on(8, 12, 19).hour()
 )
+
+// export for testing
+module.exports = {
+    server: server,
+    config: config,
+    db: db
+}

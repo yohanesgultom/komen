@@ -1,5 +1,6 @@
 {
     "server_port": 3000,
+    "recaptcha_url": "https://www.google.com/recaptcha/api/siteverify",
     "recaptcha_secret": "recaptchasecretkey",
     "db_path": "server/db",
     "mailer": {
