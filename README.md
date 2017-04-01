@@ -1,5 +1,7 @@
 # Komen
 
+[![Build Status](https://travis-ci.org/yohanesgultom/komen.png?branch=master)](https://travis-ci.org/yohanesgultom/komen)
+
 Self-hosted comment service. Powered by [express.js](http://expressjs.com) and [nedb](https://github.com/louischatriot/nedb) (mongo-like embedded database)
 
 > Todo:
